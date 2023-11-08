@@ -1,0 +1,5 @@
+venv/
+config.py
+bot.py/
+__pycache__/
+ojak_kebab_bot.db
