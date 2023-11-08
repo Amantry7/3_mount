@@ -6,6 +6,7 @@ from config import TOKEN
 from logging import basicConfig, INFO
 import sqlite3
 from datetime import datetime
+from aiogram.types import *
 
 bot = Bot(TOKEN)
 storage = MemoryStorage()
@@ -51,9 +52,15 @@ start_buttons = [
     types.KeyboardButton('О нас'),
     types.KeyboardButton('Адрес'),
     types.KeyboardButton('Заказать еду'),
+    types.KeyboardButton('соц сети'),
 ]
 start_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True).add(*start_buttons)
-
+ikb = InlineKeyboardMarkup(row_width=1)
+ib = InlineKeyboardButton(text='Истаграмм',
+                          url='https://www.instagram.com/ocak_kebap_osh/')
+ib2 = InlineKeyboardButton(text='FACEBOOK',
+                           url='https://m.facebook.com/p/%D0%9E%D0%96%D0%90%D0%9A-%D0%9A%D0%95%D0%91%D0%90%D0%91-%D0%9E%D0%A8-100058375321341/')
+ikb.add(ib,ib2)
 @dp.message_handler(commands='start')
 async def start(message:types.Message):
     cursor=connect.cursor()
@@ -70,6 +77,11 @@ async def start(message:types.Message):
         """)
         cursor.connection.commit()
     await message.answer(f"Здравствуйте {message.from_user.full_name}, добро пожаловать в Ojak Kebab!", reply_markup=start_keyboard)
+
+
+@dp.message_handler(text='соц сети')
+async def seti(message:types.Message):
+    await message.answer('наши соцеальные сети',reply_markup=ikb)
 
 @dp.message_handler(text='Меню')
 async def manu(message:types.Message):
