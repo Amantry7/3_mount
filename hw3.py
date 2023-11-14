@@ -10,15 +10,12 @@ import sqlite3
 
 from config import TOKEN
 
-# Инициализация бота и диспетчера
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
-# Подключение к базе данных SQLite
 conn = sqlite3.connect('bank_bot.db')
 cursor = conn.cursor()
 
-# Создание таблицы пользователей, если она не существует
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS users (
         user_id INTEGER PRIMARY KEY,
@@ -32,7 +29,6 @@ conn.commit()
 storage = MemoryStorage()
 dp.storage = storage
 
-# Клавиатура для команды /start
 start_keyboard = ReplyKeyboardMarkup(resize_keyboard=True).add(KeyboardButton('/balance')).add(KeyboardButton('/transfer')).add(KeyboardButton('/deposit'))
 
 @dp.message_handler(commands=['start'])
@@ -42,15 +38,12 @@ async def cmd_start(message: types.Message):
     existing_user = cursor.fetchone()
 
     if not existing_user:
-        # Если пользователя нет в базе данных, добавь его
         cursor.execute('INSERT INTO users (user_id, username, number_balance) VALUES (?, ?, ?)', (user_id, message.from_user.username, message.from_user.id))
         conn.commit()
 
-    # Формирование чека о пользователе
     user_info = f"Ваш номер счета: {message.from_user.id}\n"
     user_info += f"Никнейм: {message.from_user.username}"
 
-    # Отправка чека о пользователе
     await message.answer(f"Информация о вас .\n\n{user_info}", reply_markup=start_keyboard)
 
     await message.answer("Привет! Этот бот Оптима банк \n/balance - посмотреть баланс \n/deposit - пополнить баланс \n/transfer - перевести на другой счет", reply_markup=start_keyboard)
