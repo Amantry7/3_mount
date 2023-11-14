@@ -1,174 +1,174 @@
-from aiogram import Bot, Dispatcher, types, executor
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import State, StatesGroup
-from config import TOKEN 
-from logging import basicConfig, INFO
-import sqlite3
-from datetime import datetime
-from aiogram.types import *
+# from aiogram import Bot, Dispatcher, types, executor
+# from aiogram.contrib.fsm_storage.memory import MemoryStorage
+# from aiogram.dispatcher import FSMContext
+# from aiogram.dispatcher.filters.state import State, StatesGroup
+# from config import TOKEN 
+# from logging import basicConfig, INFO
+# import sqlite3
+# from datetime import datetime
+# from aiogram.types import *
 
-bot = Bot(TOKEN)
-storage = MemoryStorage()
-dp = Dispatcher(bot, storage=storage)
-basicConfig(level=INFO)
-
-
-connect = sqlite3.connect('ojak_kebab_bot.db')
-cursor = connect.cursor()
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY,
-        username VARCHAR(100),
-        first_name VARCHAR(100),
-        last_name VARCHAR(100),
-        date_joined DATETIME
-    );
-''')
-connect.commit()
+# bot = Bot(TOKEN)
+# storage = MemoryStorage()
+# dp = Dispatcher(bot, storage=storage)
+# basicConfig(level=INFO)
 
 
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS orders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name VARCHAR(100),
-        title TEXT,
-        phone_number VARCHAR(100),
-        address VARCHAR(100)
-    );
-''')
-connect.commit()
-
-class OrderFoodState(StatesGroup):
-    name = State()
-    title = State()
-    phone_number = State()
-    address = State()
+# connect = sqlite3.connect('ojak_kebab_bot.db')
+# cursor = connect.cursor()
+# cursor.execute('''
+#     CREATE TABLE IF NOT EXISTS users (
+#         id INTEGER PRIMARY KEY,
+#         username VARCHAR(100),
+#         first_name VARCHAR(100),
+#         last_name VARCHAR(100),
+#         date_joined DATETIME
+#     );
+# ''')
+# connect.commit()
 
 
+# cursor.execute('''
+#     CREATE TABLE IF NOT EXISTS orders (
+#         id INTEGER PRIMARY KEY AUTOINCREMENT,
+#         name VARCHAR(100),
+#         title TEXT,
+#         phone_number VARCHAR(100),
+#         address VARCHAR(100)
+#     );
+# ''')
+# connect.commit()
 
-start_buttons = [
-    types.KeyboardButton('Меню'),
-    types.KeyboardButton('О нас'),
-    types.KeyboardButton('Адрес'),
-    types.KeyboardButton('Заказать еду'),
-    types.KeyboardButton('соц сети'),
-]
-start_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True).add(*start_buttons)
-ikb = InlineKeyboardMarkup(row_width=1)
-ib = InlineKeyboardButton(text='Истаграмм',
-                          url='https://www.instagram.com/ocak_kebap_osh/')
-ib2 = InlineKeyboardButton(text='FACEBOOK',
-                           url='https://m.facebook.com/p/%D0%9E%D0%96%D0%90%D0%9A-%D0%9A%D0%95%D0%91%D0%90%D0%91-%D0%9E%D0%A8-100058375321341/')
-ikb.add(ib,ib2)
-@dp.message_handler(commands='start')
-async def start(message:types.Message):
-    cursor=connect.cursor()
-    cursor.execute(f"SELECT id FROM users WHERE id = {message.from_user.id};")
-    res = cursor.fetchall()
-    if not  res:
-        cursor.execute(f"""INSERT INTO users (id, username, first_name, last_name, date_joined) VALUES (
-            {message.from_user.id},
-            '{message.from_user.first_name}',
-            '{message.from_user.last_name}',
-            '{message.from_user.username}',
-            '{datetime.now()}'
-        );
-        """)
-        cursor.connection.commit()
-    await message.answer(f"Здравствуйте {message.from_user.full_name}, добро пожаловать в Ojak Kebab!", reply_markup=start_keyboard)
+# class OrderFoodState(StatesGroup):
+#     name = State()
+#     title = State()
+#     phone_number = State()
+#     address = State()
 
 
-@dp.message_handler(text='соц сети')
-async def seti(message:types.Message):
-    await message.answer('наши соцеальные сети',reply_markup=ikb)
 
-@dp.message_handler(text='Меню')
-async def manu(message:types.Message):
-    await message.answer('Вот Меню\nhttps://nambafood.kg/ojak-kebap', reply_markup=start_keyboard)
+# start_buttons = [
+#     types.KeyboardButton('Меню'),
+#     types.KeyboardButton('О нас'),
+#     types.KeyboardButton('Адрес'),
+#     types.KeyboardButton('Заказать еду'),
+#     types.KeyboardButton('соц сети'),
+# ]
+# start_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True).add(*start_buttons)
+# ikb = InlineKeyboardMarkup(row_width=1)
+# ib = InlineKeyboardButton(text='Истаграмм',
+#                           url='https://www.instagram.com/ocak_kebap_osh/')
+# ib2 = InlineKeyboardButton(text='FACEBOOK',
+#                            url='https://m.facebook.com/p/%D0%9E%D0%96%D0%90%D0%9A-%D0%9A%D0%95%D0%91%D0%90%D0%91-%D0%9E%D0%A8-100058375321341/')
+# ikb.add(ib,ib2)
+# @dp.message_handler(commands='start')
+# async def start(message:types.Message):
+#     cursor=connect.cursor()
+#     cursor.execute(f"SELECT id FROM users WHERE id = {message.from_user.id};")
+#     res = cursor.fetchall()
+#     if not  res:
+#         cursor.execute(f"""INSERT INTO users (id, username, first_name, last_name, date_joined) VALUES (
+#             {message.from_user.id},
+#             '{message.from_user.first_name}',
+#             '{message.from_user.last_name}',
+#             '{message.from_user.username}',
+#             '{datetime.now()}'
+#         );
+#         """)
+#         cursor.connection.commit()
+#     await message.answer(f"Здравствуйте {message.from_user.full_name}, добро пожаловать в Ojak Kebab!", reply_markup=start_keyboard)
 
 
-@dp.message_handler(text='О нас')
-async def about(message:types.Message):
-    await message.answer('Кафе "Ожак Кебап" на протяжении 18 лет радует своих гостей с изысканными турецкими блюдами в особенности своим кебабом.\nНаше кафе отличается от многих кафе своими доступными ценами и быстрым сервисом.\nПодробнее https://ocak.uds.app/c/about')
+# @dp.message_handler(text='соц сети')
+# async def seti(message:types.Message):
+#     await message.answer('наши соцеальные сети',reply_markup=ikb)
+
+# @dp.message_handler(text='Меню')
+# async def manu(message:types.Message):
+#     await message.answer('Вот Меню\nhttps://nambafood.kg/ojak-kebap', reply_markup=start_keyboard)
 
 
-@dp.message_handler(text='Адрес')
-async def adres(message:types.Message):
-    await message.answer('Исы Ахунбаева ,97а. +996700505333\nОткрыто до 00:00.\n Наши другие точки можете посмотреть: https://ocak.uds.app/c/about')
+# @dp.message_handler(text='О нас')
+# async def about(message:types.Message):
+#     await message.answer('Кафе "Ожак Кебап" на протяжении 18 лет радует своих гостей с изысканными турецкими блюдами в особенности своим кебабом.\nНаше кафе отличается от многих кафе своими доступными ценами и быстрым сервисом.\nПодробнее https://ocak.uds.app/c/about')
 
 
-@dp.message_handler(text='Заказать еду')
-async def ordes(message:types.Message):
-    await message.answer('Введите ваше имя')
-    await OrderFoodState.name.set()
+# @dp.message_handler(text='Адрес')
+# async def adres(message:types.Message):
+#     await message.answer('Исы Ахунбаева ,97а. +996700505333\nОткрыто до 00:00.\n Наши другие точки можете посмотреть: https://ocak.uds.app/c/about')
 
 
-@dp.message_handler(state=OrderFoodState.name)
-async def processtitle(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['name'] = message.text
+# @dp.message_handler(text='Заказать еду')
+# async def ordes(message:types.Message):
+#     await message.answer('Введите ваше имя')
+#     await OrderFoodState.name.set()
 
-    await message.answer("Что хотите заказать?")
-    await OrderFoodState.next()
 
-@dp.message_handler(state=OrderFoodState.title)
-async def process_food(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['title'] = message.text
+# @dp.message_handler(state=OrderFoodState.name)
+# async def processtitle(message: types.Message, state: FSMContext):
+#     async with state.proxy() as data:
+#         data['name'] = message.text
 
-    await message.answer("Введите свой номер телефона")
-    await OrderFoodState.next() 
+#     await message.answer("Что хотите заказать?")
+#     await OrderFoodState.next()
+
+# @dp.message_handler(state=OrderFoodState.title)
+# async def process_food(message: types.Message, state: FSMContext):
+#     async with state.proxy() as data:
+#         data['title'] = message.text
+
+#     await message.answer("Введите свой номер телефона")
+#     await OrderFoodState.next() 
     
-import re
+# import re
 
-# ...
-
-@dp.message_handler(state=OrderFoodState.phone_number)
-async def process(message: types.Message, state: FSMContext):
-    phone_number = message.text
-
-    # Проверка номера телефона с использованием регулярного выражения
-    if re.match(r'^\+?\d{1,3}?\d{9,15}$', phone_number):
-        async with state.proxy() as data:
-            data['phone_number'] = phone_number
-
-        await message.answer("Введите свой адрес")
-        await OrderFoodState.next()
-    else:
-        await message.answer("Некорректный номер телефона. Пожалуйста, введите корректный номер.")
-
+# # ...
 
 # @dp.message_handler(state=OrderFoodState.phone_number)
 # async def process(message: types.Message, state: FSMContext):
+#     phone_number = message.text
+
+#     # Проверка номера телефона с использованием регулярного выражения
+#     if re.match(r'^\+?\d{1,3}?\d{9,15}$', phone_number):
+#         async with state.proxy() as data:
+#             data['phone_number'] = phone_number
+
+#         await message.answer("Введите свой адрес")
+#         await OrderFoodState.next()
+#     else:
+#         await message.answer("Некорректный номер телефона. Пожалуйста, введите корректный номер.")
+
+
+# # @dp.message_handler(state=OrderFoodState.phone_number)
+# # async def process(message: types.Message, state: FSMContext):
+# #     async with state.proxy() as data:
+# #         data['phone_number'] = message.text
+
+# #     await message.answer("Введите свой адрес")
+# #     await OrderFoodState.next()
+
+
+# @dp.message_handler(state=OrderFoodState.address)
+# async def food_title(message: types.Message, state: FSMContext):
 #     async with state.proxy() as data:
-#         data['phone_number'] = message.text
-
-#     await message.answer("Введите свой адрес")
-#     await OrderFoodState.next()
+#         data['address'] = message.text
 
 
-@dp.message_handler(state=OrderFoodState.address)
-async def food_title(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['address'] = message.text
+#     async with state.proxy() as data:
+#         name = data['name']
+#         title = data['title']
+#         phone_number = data['phone_number']
+#         address = data['address']
 
+#     cursor.execute('''
+#         INSERT INTO orders (name, title, phone_number, address )
+#         VALUES (?, ?, ?, ?)
+#     ''', (name, title, phone_number, address))
+#     connect.commit()
 
-    async with state.proxy() as data:
-        name = data['name']
-        title = data['title']
-        phone_number = data['phone_number']
-        address = data['address']
-
-    cursor.execute('''
-        INSERT INTO orders (name, title, phone_number, address )
-        VALUES (?, ?, ?, ?)
-    ''', (name, title, phone_number, address))
-    connect.commit()
-
-    await message.answer("Ваш заказ принять.\nОн когда нибудь приедит")
-    await state.finish()
+#     await message.answer("Ваш заказ принять.\nОн когда нибудь приедит")
+#     await state.finish()
 
 
 
-executor.start_polling(dp, skip_updates=True)
+# executor.start_polling(dp, skip_updates=True)
