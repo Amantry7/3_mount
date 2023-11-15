@@ -148,24 +148,20 @@ def process_transfer(sender_id, recipient_balance_data, amount):
 
                 return True
             else:
-                return False  # Recipient not found
+                return False  
         else:
-            return False  # Insufficient balance
+            return False 
 
     except Exception as e:
-        # Rollback the transaction in case of an error
         conn.execute('ROLLBACK')
         print(f'Error: {e}')
         return False
 
     finally:
-        # Close the database connection
         conn.close()
 
-# Error handling
 async def error_handler(update, exception):
     logging.exception(exception)
     await update.message.reply("Произошла ошибка. Пожалуйста, повторите попытку позже.")
 
-# Start the bot
 executor.start_polling(dp, skip_updates=True)
