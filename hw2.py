@@ -52,7 +52,7 @@
 #     types.KeyboardButton('О нас'),
 #     types.KeyboardButton('Адрес'),
 #     types.KeyboardButton('Заказать еду'),
-#     types.KeyboardButton('соц сети'),
+#     types.KeyboardButton('соц сети')
 # ]
 # start_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True).add(*start_buttons)
 # ikb = InlineKeyboardMarkup(row_width=1)
