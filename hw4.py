@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from logging import basicConfig, INFO
 import os, requests, re
 from config import TOKEN
+
 bot = Bot(TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
