@@ -5,7 +5,6 @@ from aiogram.dispatcher import FSMContext
 from bs4 import BeautifulSoup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import logging,requests,os,config
- 
 
 
 bot = Bot(token=config.TOKEN)
@@ -20,10 +19,14 @@ currency_buttons = [
     InlineKeyboardButton('RUB', callback_data="rub"),
     InlineKeyboardButton('KZT', callback_data="kzt"),
 ]
+
+
 currency_keyboard = InlineKeyboardMarkup().add(*currency_buttons)
+
 
 class Money(StatesGroup):
     money = State()
+
 
 @dp.callback_query_handler(lambda call: call.data == "usd")
 async def handle_usd_callback(call: types.CallbackQuery, state: FSMContext):

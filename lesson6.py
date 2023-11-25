@@ -2,11 +2,12 @@ from bs4 import BeautifulSoup
 import requests
 
 def pasind_akipress():
-    url = 'https://akipress.org/'
+    url = 'https://ru.wikipedia.org/wiki/%D0%A4%D0%BE%D1%80%D1%83%D0%BC'
+    print(url)
     response = requests.get(url=url)
     print(response)
     soup = BeautifulSoup(response.text,'lxml')
-    # print(soup)
+    print(soup)
     all_nems =soup.find_all('a', class_="newslink")
     n = 0
     print(all_nems)
@@ -16,7 +17,7 @@ def pasind_akipress():
         with open('news.txt','a+', encoding='UTF-8') as news_txt: 
             news_txt.write(f"{n} {new.text}\n")
         
-# pasind_akipress()
+pasind_akipress()
 
 def persing_suplak():
     num = 0
@@ -45,8 +46,7 @@ bot = Bot(TOKEN)
 dp = Dispatcher(bot)
 logging.basicConfig(level=logging.info)
 
-@dp.message_handler(commands='start')
-async def start(message:types.MEsaсдуфк)
+
 
 @dp.message_hadler(commads="laptops")
 async def send_laptops(message:types.Message):
