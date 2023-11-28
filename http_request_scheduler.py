@@ -1,23 +1,36 @@
-import requests
 import schedule
+import requests
 import time
 
 def perform_request(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        with open('logs.txt', 'a', encoding='utf-8') as file:
-            file.write(response.text + '\n')
-    else:
-        print('ERROR')
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        with open('log.txt', 'a+', encoding='utf-8') as file:
+            file.write(f"Запрос выполнен успешно. Код состояния: {response.status_code}\n") 
+    except requests.exceptions.HTTPError as errh:
+        with open('log.txt', 'a+', encoding='utf-8') as file:
+            file.write(f"Ошибка HTTP: {errh}\n")
+    except requests.exceptions.ConnectionError as errc:
+        with open('log.txt', 'a+', encoding='utf-8') as file:
+            file.write(f"Ошибка подключения: {errc}\n")
+    except requests.exceptions.RequestException as err:
+        with open('log.txt', 'a+', encoding='utf-8') as file:
+            file.write(f"Ошибка: {err}\n")
 
-def main():
-    url = 'https://stopgame.ru/news'
-    schedule.every(10).seconds.do(perform_request, url)
-    schedule.every(60).seconds.do(perform_request, url)
+
+def main(url, start_interval, interval):
+    time.sleep(start_interval)
+    with open('log.txt', 'a+', encoding='utf-8') as file:
+            file.write(f"Запуск планировщика запросов для URL: {url}\n")
+    # print(f"Запуск планировщика запросов для URL: {url}")
+    perform_request(url)
+    
+    schedule.every(interval).seconds.do(perform_request, url)
+    
     
     while True:
         schedule.run_pending()
-        time.sleep(1)
 
-if __name__ == "__main__":
-    main()
+
+main('https://www.nbkr.kg/index.jsp?lang=RUS', 5, 0.5)
